@@ -1,7 +1,11 @@
 #pragma once
 
 #ifndef L
-#define L 256 // linear system size
+#define L 512//128-384 linear system size
+#endif
+
+#ifndef S
+#define S 128//128-384 linear system size
 #endif
 
 #ifndef TEMP_INITIAL

@@ -1,51 +1,157 @@
 #include "ising.h"
-
 #include <math.h>
 #include <stdlib.h>
 
 
-void update(const float temp, int grid[L][L])
+
+void update(const float temp, int red[L][S], int black[L][S])
 {
-    // typewriter update
-    for (unsigned int i = 0; i < L; ++i) {
-        for (unsigned int j = 0; j < L; ++j) {
-            int spin_old = grid[i][j];
+    float calcExp[3];
+    calcExp[0]=1;
+    calcExp[1]=expf(-4/ temp);
+    calcExp[2]=expf(-8/ temp);
+    
+    //black back rule
+    for (unsigned int i = 0; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_old = black[i][j];
             int spin_new = (-1) * spin_old;
 
-            // computing h_before
-            int spin_neigh_n = grid[(i + L - 1) % L][j];
-            int spin_neigh_e = grid[i][(j + 1) % L];
-            int spin_neigh_w = grid[i][(j + L - 1) % L];
-            int spin_neigh_s = grid[(i + 1) % L][j];
-            int h_before = -(spin_old * spin_neigh_n) - (spin_old * spin_neigh_e) - (spin_old * spin_neigh_w) - (spin_old * spin_neigh_s);
+            int spin_neigh_n = red[(i+1)%L][j];
+            int spin_neigh_e = red[i][j];
+            int spin_neigh_w = red[i][(j + L - 1) % L];
+            int spin_neigh_s = red[(i-1)%L][j];
 
-            // h after taking new spin
-            int h_after = -(spin_new * spin_neigh_n) - (spin_new * spin_neigh_e) - (spin_new * spin_neigh_w) - (spin_new * spin_neigh_s);
 
-            int delta_E = h_after - h_before;
-            float p = rand() / (float)RAND_MAX;
-            if (delta_E <= 0 || p <= expf(-delta_E / temp)) {
-                grid[i][j] = spin_new;
+            int delta_E = 2 * spin_old * (spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            if ( delta_E <= 0 || rand() / (float)RAND_MAX <= calcExp[abs(delta_E)/4]) {
+                black[i][j] = spin_new;
             }
         }
     }
-}
+    //black foward rule
+    for (unsigned int i = 1; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_old = black[i][j];
+            int spin_new = (-1) * spin_old;
+
+            int spin_neigh_n = red[(i+1)%L][j];
+            int spin_neigh_e = red[i][(j + L + 1) % L];
+            int spin_neigh_w = red[i][j];
+            int spin_neigh_s = red[(i-1)%L][j];
 
 
-double calculate(int grid[L][L], int* M_max)
-{
-    int E = 0;
-    for (unsigned int i = 0; i < L; ++i) {
-        for (unsigned int j = 0; j < L; ++j) {
-            int spin = grid[i][j];
-            int spin_neigh_n = grid[(i + 1) % L][j];
-            int spin_neigh_e = grid[i][(j + 1) % L];
-            int spin_neigh_w = grid[i][(j + L - 1) % L];
-            int spin_neigh_s = grid[(i + L - 1) % L][j];
-
-            E += (spin * spin_neigh_n) + (spin * spin_neigh_e) + (spin * spin_neigh_w) + (spin * spin_neigh_s);
-            *M_max += spin;
+            int delta_E = 2 * spin_old * (spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            if ( delta_E <= 0 || rand() / (float)RAND_MAX <= calcExp[abs(delta_E)/4]) {
+                black[i][j] = spin_new;
+            }
         }
     }
+    //red foward rule
+    for (unsigned int i = 0; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_old = black[i][j];
+            int spin_new = (-1) * spin_old;
+
+            int spin_neigh_n = black[(i+1)%L][j];
+            int spin_neigh_e = black[i][(j + L + 1) % L];
+            int spin_neigh_w = black[i][j];
+            int spin_neigh_s = black[(i-1)%L][j];
+
+
+            int delta_E = 2 * spin_old * (spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            if ( delta_E <= 0 || rand() / (float)RAND_MAX <= calcExp[abs(delta_E)/4]) {
+                black[i][j] = spin_new;
+            }
+        }
+    }
+    //red back rule
+    for (unsigned int i = 1; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_old = red[i][j];
+            int spin_new = (-1) * spin_old;
+
+            int spin_neigh_n = black[(i+1)%L][j];
+            int spin_neigh_e = black[i][j];
+            int spin_neigh_w = black[i][(j + L - 1) % L];
+            int spin_neigh_s = black[(i-1)%L][j];
+
+
+            int delta_E = 2 * spin_old * (spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            if ( delta_E <= 0 || rand() / (float)RAND_MAX <= calcExp[abs(delta_E)/4]) {
+                red[i][j] = spin_new;
+            }
+        }
+    }
+
+}
+
+
+double calculate(int red[L][S],int black[L][S], int* M_max)
+{
+    int E = 0;
+
+    //black back rule
+    for (unsigned int i = 0; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            int spin_neigh_n = red[(i+1)%L][j];
+            int spin_neigh_e = red[i][j];
+            int spin_neigh_w = red[i][(j + L - 1) % L];
+            int spin_neigh_s = red[(i-1)%L][j];
+             
+             E+= black[i][j]*(spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            *M_max += black[i][j];
+        }
+    }
+    //black foward rule
+    for (unsigned int i = 1; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_neigh_n = red[(i+1)%L][j];
+            int spin_neigh_e = red[i][(j + L + 1) % L];
+            int spin_neigh_w = red[i][j];
+            int spin_neigh_s = red[(i-1)%L][j];
+
+             E+= black[i][j]*(spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            *M_max += black[i][j];
+        }
+    }
+    //red foward rule
+    for (unsigned int i = 0; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_neigh_n = black[(i+1)%L][j];
+            int spin_neigh_e = black[i][(j + L + 1) % L];
+            int spin_neigh_w = black[i][j];
+            int spin_neigh_s = black[(i-1)%L][j];
+
+             E+= red[i][j]*(spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            *M_max += red[i][j];
+        }
+    }
+    //red back rule
+    for (unsigned int i = 1; i < L; i+=2) {
+        for (unsigned int j = 0; j < S; ++j) {
+            
+            int spin_neigh_n = black[(i+1)%L][j];
+            int spin_neigh_e = black[i][j];
+            int spin_neigh_w = black[i][(j + L - 1) % L];
+            int spin_neigh_s = black[(i-1)%L][j];
+
+             E+= red[i][j]*(spin_neigh_n +  spin_neigh_e +  spin_neigh_w + spin_neigh_s);
+            *M_max += red[i][j];
+
+        }
+    }
+
+
     return -((double)E / 2.0);
 }
+
+
+
+    
