@@ -4,7 +4,7 @@
 
 
 
-void update(const float temp, int red[L][S], int black[L][S])
+void update(const float temp, int red[L][S], int  black[L][S])
 {
     float calcExp[3];
     calcExp[0]=1;

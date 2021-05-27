@@ -156,16 +156,13 @@ int main(void)
 
     // configure RNG
     srand(SEED);
-
-    
-
+ 
     // start timer
     double start = wtime();
 
     // clear the grid
     int red[L][S] = { { 0 } }, black[L][S] = { { 0 } };
-    init_red(red);
-    init_black(black);
+    init_red(red); init_black(black);
     // temperature increasing cycle
     cycle(red, black, TEMP_INITIAL, TEMP_FINAL, TEMP_DELTA, DELTA_T, stat);
 
