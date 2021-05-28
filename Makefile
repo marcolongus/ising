@@ -3,12 +3,12 @@ CFLAGS    = -std=c11 -Wall -Wextra -march=native
 LDFLAGS   = -lm
 
 # Files
-TARGETS=for_openmp
+TARGETS=tiny_ising_rb
 
 # Rules
 all: $(TARGETS)
 
-for_openmp: for_openmp.o
+tiny_ising_rb: tiny_ising_rb.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 
