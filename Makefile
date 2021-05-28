@@ -4,13 +4,10 @@ LDFLAGS   = -lm
 
 
 # Files
-TARGETS=tiny_ising grid
+TARGETS= grid
 
 # Rules
 all: $(TARGETS)
-
-tiny_ising: tiny_ising.o ising.o wtime.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 grid: grid.o ising.o wtime.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)

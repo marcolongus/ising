@@ -20,16 +20,25 @@ int main(void){
 		black[L][S]={{0}};
 	init_grid(red); init_grid(black);
 
+
 	for (int i=0; i<L ;i++){
 		for (int j=0; j<S; j++){
 			printf(" %2i ", red[i][j]);
 		}
 		printf("\n");
 	}
+
 	printf("\n");
 
     srand(SEED);
-	update(150, black, red);
+
+    float temp = 100;
+    float calcExp[3];
+    calcExp[0] = 1;
+    calcExp[1] = expf(-4/ temp);
+    calcExp[2] = expf(-8/ temp);
+
+	update(calcExp, black, red);
 
 	for (int i=0; i<L ;i++){
 		for (int j=0; j<S; j++){
@@ -38,8 +47,10 @@ int main(void){
 		printf("\n");
 	}
 
+
 	return 0;
 }
+
 
 static void init_grid(int grid[L][S])
 {

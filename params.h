@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef L
-#define L 8//128-384 linear system size
+#define L 4//128-384 linear system size
 #endif
 
 #ifndef S
