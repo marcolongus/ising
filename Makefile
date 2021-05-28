@@ -1,5 +1,5 @@
 CC        = gcc
-CFLAGS    = -std=c11 -Wall -Wextra -march=native -O3 -ftree-vectorize -fopt-info-vec -fopt-info-vec-missed  -fopenmp
+CFLAGS    = -std=c11 -Wall -Wextra -march=native -O3 -ftree-vectorize  -fopenmp
 LDFLAGS   = -lm
 
 # Files

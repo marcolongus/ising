@@ -87,7 +87,12 @@ update_rb(grid_color color,
           const int * restrict read,
           int * restrict write) {
 
-	int side_shift = color == RED ? -1 : 1;
+    float calcExp[3];
+    calcExp[0]=1;
+    calcExp[1]=expf(-4/ temp);
+    calcExp[2]=expf(-8/ temp);
+
+	int side_shift = (color == RED) ? -1 : 1;
 
 	for (int y = 0; y < HEIGHT; ++y, side_shift = -side_shift) {
 		for (int x = 0; x < WIDTH; ++x) {
@@ -100,16 +105,14 @@ update_rb(grid_color color,
 			int spin_neigh_side = read[idx((x + side_shift + WIDTH) % WIDTH, y)];
 			int spin_neigh_down = read[idx(x, (y + 1) % HEIGHT)];
 
-			int h_before = - (spin_old*spin_neigh_up)   - (spin_old*spin_neigh_same)
-				   - (spin_old*spin_neigh_side) - (spin_old*spin_neigh_down);
+			int h_before = -spin_old*(spin_neigh_up + spin_neigh_same + spin_neigh_side + spin_neigh_down);
 
 			// h after taking new spin
-			int h_after = - (spin_new*spin_neigh_up)   - (spin_new*spin_neigh_same)
-			              - (spin_new*spin_neigh_side) - (spin_new*spin_neigh_down);
+			int h_after = -spin_new*(spin_neigh_up + spin_neigh_same + spin_neigh_side + spin_neigh_down);
 
 			int delta_E = h_after - h_before;
 			float p = rand()/(float)RAND_MAX;
-			if (delta_E<=0 || p<=expf(-delta_E/temp)) {
+			if (delta_E<=0 || p<=expf(calcExp[abs(delta_E)/4])) {
 				write[idx(x, y)] = spin_new;
 			}
 		}
