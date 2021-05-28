@@ -19,7 +19,7 @@
 #include <omp.h> // omp_get_wtime()
 
 #ifndef L
-#define L 128 // linear system size
+#define L 512 // linear system size
 #endif
 
 #ifndef SAMPLES
@@ -121,7 +121,7 @@ void
 update(const float temp,
        int * restrict grid_r,
        int * restrict grid_b) {
-	update_rb(RED, temp, grid_b, grid_r);
+	update_rb(RED  , temp, grid_b, grid_r);
 	update_rb(BLACK, temp, grid_r, grid_b);
 }
 
@@ -264,14 +264,14 @@ main(void)
 
 	// print header
 	printf("# L: %i\n", L);
-	printf("# Number of Samples: %i\n", SAMPLES);
+	printf("# Number of Samples  : %i\n", SAMPLES);
 	printf("# Minimum Temperature: %f\n", TEMP_MIN);
 	printf("# Maximum Temperature: %f\n", TEMP_MAX);
-	printf("# Temperature Step: %.12f\n", DELTA_TEMP);
-	printf("# Equilibration Time: %i\n", TRAN);
-	printf("# Measurement Time: %i\n", TMAX);
+	printf("# Temperature Step   : %.12f\n", DELTA_TEMP);
+	printf("# Equilibration Time : %i\n", TRAN);
+	printf("# Measurement Time   : %i\n", TMAX);
 	printf("# Data Acquiring Step: %i\n", DELTA_T);
-	printf("# Number of Points: %i\n", NPOINTS);
+	printf("# Number of Points   : %i\n", NPOINTS);
 
 	// configure RNG
 	srand(SEED);
@@ -285,7 +285,7 @@ main(void)
 
 	// stop timer
 	elapsed = omp_get_wtime()-start;
-	printf("# Total Simulation Time (sec): %lf\n", elapsed);
+	printf("\n# Total Simulation Time (sec): %lf\n", elapsed);
 
 	printf("# Temp\tE\tE^2\tE^4\tM\tM^2\tM^4\n");
 	for (unsigned int i=0; i<NPOINTS; ++i) {
