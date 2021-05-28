@@ -27,23 +27,23 @@
 #endif
 
 #ifndef TEMP_MIN
-#define TEMP_MIN 0.9f // minimum temperature
+#define TEMP_MIN 1.5f // minimum temperature
 #endif
 
 #ifndef TEMP_MAX
-#define TEMP_MAX 1.35f // maximum temperature
+#define TEMP_MAX 3.f // maximum temperature
 #endif
 
 #ifndef DELTA_TEMP
-#define DELTA_TEMP 0.05f // temperature step
+#define DELTA_TEMP 0.01f // temperature step
 #endif
 
 #ifndef TRAN
-#define TRAN 20 // equilibration time
+#define TRAN 5 // equilibration time
 #endif
 
 #ifndef TMAX
-#define TMAX 800 // measurement time
+#define TMAX 25 // measurement time
 #endif
 
 #ifndef DELTA_T
@@ -276,6 +276,12 @@ main(void)
 	printf("# Data Acquiring Step: %i\n", DELTA_T);
 	printf("# Number of Points   : %i\n", NPOINTS);
 
+    // files
+    FILE * data;
+    FILE * ejec_time;
+    data      = fopen("data_nuevo.txt"     , "w");
+    ejec_time = fopen("ejec_time.txt"      , "a");
+
 	// configure RNG
 	srand(SEED);
 
@@ -289,6 +295,7 @@ main(void)
 	// stop timer
 	elapsed = omp_get_wtime()-start;
 	printf("\n# Total Simulation Time (sec): %lf\n", elapsed);
+	fprintf(ejec_time,"%lf\n", 4500*((double)L*(double)L)/(1000000*elapsed));
 
 	printf("# Temp\tE\tE^2\tE^4\tM\tM^2\tM^4\n");
 	for (unsigned int i=0; i<NPOINTS; ++i) {
@@ -305,5 +312,19 @@ main(void)
 	free(grid_r);
 	free(grid_b);
 
+    fprintf(data,"# Temp\t\tE\t\t\t\tE^2\t\t\t\tE^4\t\t\t\tM\t\t\t\tM^2\t\t\t\tM^4\n");
+    for (unsigned int i = 0; i < NPOINTS; ++i) {
+        fprintf(data,"%lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
+               stat[i].t,
+               stat[i].e / ((double)N),
+               stat[i].e2 / ((double)N * N),
+               stat[i].e4 / ((double)N * N * N * N),
+               stat[i].m,
+               stat[i].m2,
+               stat[i].m4);
+    }
+	
+    fclose(data);
+    fclose(ejec_time);
 	return 0;
 }
