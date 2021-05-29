@@ -92,7 +92,7 @@ update_rb(grid_color color,
     calcExp[1]=expf(-4/ temp);
     calcExp[2]=expf(-8/ temp);
 
-	int side_shift = (color == RED) ? -1 : 1;
+	int side_shift = color == RED ? -1 : 1;
 
 	for (int y = 0; y < HEIGHT; ++y, side_shift = -side_shift) {
 		for (int x = 0; x < WIDTH; ++x) {
@@ -105,14 +105,17 @@ update_rb(grid_color color,
 			int spin_neigh_side = read[idx((x + side_shift + WIDTH) % WIDTH, y)];
 			int spin_neigh_down = read[idx(x, (y + 1) % HEIGHT)];
 
-			int h_before = -spin_old*(spin_neigh_up + spin_neigh_same + spin_neigh_side + spin_neigh_down);
+			int h_before = -spin_old*( spin_neigh_up    + spin_neigh_same 
+						   +     	   spin_neigh_side  + spin_neigh_down );
 
 			// h after taking new spin
-			int h_after = -spin_new*(spin_neigh_up + spin_neigh_same + spin_neigh_side + spin_neigh_down);
+			int h_after = -spin_new*( spin_neigh_up    + spin_neigh_same 
+						  +			  spin_neigh_side  + spin_neigh_down );
 
 			int delta_E = h_after - h_before;
+
 			float p = rand()/(float)RAND_MAX;
-			if (delta_E<=0 || p<=expf(calcExp[abs(delta_E)/4])) {
+			if (delta_E<=0 || p<=calcExp[abs(delta_E)/4]) {
 				write[idx(x, y)] = spin_new;
 			}
 		}
@@ -147,8 +150,8 @@ calculate_rb(grid_color color,
 			int spin_neigh_side = neigh[idx((x + side_shift + WIDTH) % WIDTH, y)];
 			int spin_neigh_down = neigh[idx(x, (y + 1) % HEIGHT)];
 
-			E += (spin * spin_neigh_up)   + (spin * spin_neigh_same) +
-			     (spin * spin_neigh_side) + (spin * spin_neigh_down);
+			E += spin * ( spin_neigh_up   +  spin_neigh_same +
+			     	      spin_neigh_side +  spin_neigh_down );
 			*M_max += spin;
 		}
 	}
@@ -296,18 +299,6 @@ main(void)
 	elapsed = omp_get_wtime()-start;
 	printf("\n# Total Simulation Time (sec): %lf\n", elapsed);
 	fprintf(ejec_time,"%lf\n", 4500*((double)L*(double)L)/(1000000*elapsed));
-
-	printf("# Temp\tE\tE^2\tE^4\tM\tM^2\tM^4\n");
-	for (unsigned int i=0; i<NPOINTS; ++i) {
-		printf ("%lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
-			stat[i].t,
-			stat[i].e/((double)N*SAMPLES),
-			stat[i].e2/((double)N*N*SAMPLES),
-			stat[i].e4/((double)N*N*N*N*SAMPLES),
-			stat[i].m/SAMPLES,
-			stat[i].m2/SAMPLES,
-			stat[i].m4/SAMPLES);
-	}
 
 	free(grid_r);
 	free(grid_b);
