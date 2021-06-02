@@ -314,7 +314,7 @@ main(void)
                stat[i].m2,
                stat[i].m4);
     }
-	
+
     fclose(data);
     fclose(ejec_time);
 	return 0;
