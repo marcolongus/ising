@@ -1,19 +1,17 @@
-CC=gcc
-CFLAGS=-std=c11 -Wall -Wextra
-LDFLAGS=-lm
-GL_LDFLAGS=-lGL -lglfw
+CC      = gcc
+CFLAGS  = -std=c11 -Wall -Wextra -fopenmp -O3
+LDFLAGS = -lm
+
 
 # Files
-TARGETS=tiny_ising demo
+TARGETS =tiny_ising_rb
 
 # Rules
 all: $(TARGETS)
 
-tiny_ising: tiny_ising.o ising.o wtime.o
+tiny_ising_rb: tiny_ising_rb.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-demo: demo.o ising.o wtime.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(GL_LDFLAGS)
 
 clean:
 	rm -f $(TARGETS) *.o
